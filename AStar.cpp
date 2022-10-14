@@ -47,34 +47,7 @@ void AStar::input_astar(string filename, string weight){
 }
 
 void AStar::astar_execute(int root, int destination){
-    priority_queue<ii, vector<ii>, greater<ii>> road;
-    for (int i = 0; i < max; i++)
-    {
-        d[i] = maxr;
-    }
-    d[root] = 0;
-    road.push(ii(root, 0));
-    while (!road.empty())
-    {
-        ii top = road.top();
-        road.pop();
-        int u = top.first;
-        if (d[u] != top.second)
-            continue;
-
-        for (int i = 0; i < graph[u].size(); i++)
-        {
-            int v = graph[u][i].first;
-            int uv = graph[u][i].second;
-            if (d[v] + weight[v] > d[u] + uv + weight[v])
-            {
-                d[v] = d[u] + uv;
-                road.push(ii(v, d[v]));
-                check[v] = u;
-                if(v == destination) break;
-            }
-        }
-    }
+    
 }
 
 void AStar::print_astar(int begin, int destination)
