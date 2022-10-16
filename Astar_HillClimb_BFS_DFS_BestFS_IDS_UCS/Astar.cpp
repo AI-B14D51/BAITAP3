@@ -97,16 +97,16 @@ void Result_Astar(int s, int t, vector<vector<int>> Matrix) {
     fout.open("output.out", ios::out | ios::trunc);
     fout << "Astar\n";
     fout << "Duong di tu " << s << " den " << t << " la: " << endl;
-    int go =nodes[t].h;
+    int cost =nodes[t].h;
     while(t != s) {
         fout << t << "<-";
         int a = nodes[t].cha;
-        go=go+nodes[a].h+Matrix[t][a];
+        cost=cost+nodes[a].h+Matrix[t][a];
         t=a;
     }
-    go=go+nodes[s].h;
+    cost=cost+nodes[s].h;
     fout << s<<endl;
-    fout << "Do dai duong di la: "<<go<<endl;
+    fout << "Do dai duong di la: "<<cost<<endl;
     double vm, rss;
     process_mem_usage(vm, rss);
     fout << "Memory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
