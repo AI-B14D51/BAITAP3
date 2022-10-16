@@ -25,27 +25,17 @@ void IDS::addEdge(int v, int w)
     adj[v].push_back(w);
 }
 
-void IDS::InitIDS(string filein, string filein2)
+void IDS::InitIDS(string filein)
 {
-    fstream fin,fin2;
-    fin2.open(filein2, ios::in);
-    int u, v, w, a, b;
-    
-    while (!fin2.eof())
-    {
-    	fin2 >>a >>b;
-    	fin.open(filein, ios::in);
-      while (!fin.eof())
+    fstream fin;
+    int u, v, w;
+   	fin.open(filein, ios::in);
+    while (!fin.eof())
     {
         fin >> u >> v >> w;
-        if(a==u){
-        	w=w+b;
-        	addEdge(u, v);
-		}
+       	addEdge(u, v);
 	}
 		fin.close();  
-	}
-	fin2.close();
 }
 
 int IDS::DLS(int v, int goal, int limit)
@@ -89,14 +79,14 @@ int IDS::IDDFS(int src, int goal, int limit)
     return -1;
 }
 
-void IDS::runIDS(string filein, string filein2, int src, int goal, int limit)
+void IDS::runIDS(string filein, int src, int goal, int limit)
 {
     clock_t start = clock();
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
     fout << "IDS\n";
     fout.close();
-    InitIDS(filein, filein2);
+    InitIDS(filein);
     fout.open("output.out", ios::app);
     if(IDDFS(src,goal,limit)==1)
         fout<<"\nGoal node found within depth limit";
@@ -112,6 +102,6 @@ void IDS::runIDS(string filein, string filein2, int src, int goal, int limit)
 }
 
 double IDS::get_solution(bool is_ds){
-    runIDS(Constants::FILEIN, Constants::FILEIN2, Constants::start, Constants::end, Constants::limit);
+    runIDS(Constants::FILEIN, Constants::start, Constants::end, Constants::limit);
     return 0.0;
 }

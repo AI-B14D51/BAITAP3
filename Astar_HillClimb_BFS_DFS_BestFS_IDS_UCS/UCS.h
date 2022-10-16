@@ -7,7 +7,7 @@ public:
 	UCS(Network * g);
 	~UCS();
 	double get_solution(bool is_ds = true);
-    void InitUCS(string filein, string filein2);
+    void InitUCS(string filein);
     vector<int> uniform_cost_search(vector<int> goal, int start);
 };
 

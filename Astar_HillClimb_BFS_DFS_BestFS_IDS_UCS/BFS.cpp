@@ -25,31 +25,22 @@ vector<int> truoc(MAX, 0);
 vector<int> d(MAX, 0);       
 vector<int> chuaxet(MAX, 0); 
 
-void BFS::InitBFS(string filein,string filein2, int n, int s, int t, vector<vector<int>> &Matrix)
+void BFS::InitBFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
 {
-    fstream fin,fin2;
-    fin2.open(filein2, ios::in);
-    int u, v, w, a, b;
+    fstream fin;
+    int u, v, w;
     Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++)
             Matrix[i][j] = VOCUNG;
-    while (!fin2.eof())
-    {
-    	fin2 >>a >>b;
-    	fin.open(filein, ios::in);
-      while (!fin.eof())
+    fin.open(filein, ios::in);
+    while (!fin.eof())
     {
         fin >> u >> v >> w;
-        if(a==u){
-        	w=w+b;
-        	Matrix[u][v]=w;
-        	Matrix[v][u]=w;
-		}
+        Matrix[u][v]=w;
+       	Matrix[v][u]=w;
 	}
 		fin.close();  
-	}
-	fin2.close();
 }
 void BFS::ResultBFS(int s, int t)
 {
@@ -115,11 +106,11 @@ void BFS::alg_BFS(int n, int s, int t, vector<vector<int>> Matrix)
     }
 }
 
-void BFS::runBFS(string filein,string filein2, int n, int s, int t, vector<vector<int>> &Matrix)
+void BFS::runBFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
 {
     // BFS
     clock_t start = clock();
-    InitBFS(filein,filein2, n, s, t, Matrix);
+    InitBFS(filein, n, s, t, Matrix);
     alg_BFS(n, s, t, Matrix);
     ResultBFS(s, t);
     clock_t end = clock();
@@ -132,6 +123,6 @@ void BFS::runBFS(string filein,string filein2, int n, int s, int t, vector<vecto
 
 double BFS::get_solution(bool is_ds){
     vector<vector<int>> Matrix;
-    runBFS(Constants::FILEIN, Constants::FILEIN2, Constants::n_nodes, Constants::start, Constants::end, Matrix);
+    runBFS(Constants::FILEIN, Constants::n_nodes, Constants::start, Constants::end, Matrix);
     return 0.0;
 }

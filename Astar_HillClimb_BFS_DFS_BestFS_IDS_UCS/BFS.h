@@ -7,9 +7,9 @@ public:
 	BFS(Network * g);
 	~BFS();
 	double get_solution(bool is_ds = true);
-	void InitBFS(string filein,string filein2, int n, int s, int t, vector<vector<int>> &Matrix);
+	void InitBFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix);
     void ResultBFS(int s, int t);
     void alg_BFS(int n, int s, int t, vector<vector<int>> Matrix);
-    void runBFS(string filein,string filein2, int n, int s, int t, vector<vector<int>> &Matrix);
+    void runBFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix);
 };
 

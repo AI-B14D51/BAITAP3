@@ -27,27 +27,18 @@ void bestFS::addedge(int x, int y, int cost)
     graphBestFS[y].push_back(make_pair(cost, x));
 }
 
- void bestFS::InitBestFS(string filein,string filein2) {
+ void bestFS::InitBestFS(string filein) {
     graphBestFS.resize(Constants::n_nodes);
-    fstream fin,fin2;
+    fstream fin;
     
-    fin2.open(filein2, ios::in);
-    int u, v, w, a, b;
-    while (!fin2.eof())
-    {
-    	fin2 >>a >>b;
-    	fin.open(filein, ios::in);
+    int u, v, w;
+    fin.open(filein, ios::in);
       while (!fin.eof())
     {
         fin >> u >> v >> w;
-        if(a==u){
-        	w=w+b;
-        	addedge(u, v, w);
-		}
+        addedge(u, v, w);
 	}
 		fin.close();  
-	}
-	fin2.close();
 }
 // Function For Implementing Best First Search
 // Gives output path having lowest cost
@@ -88,7 +79,7 @@ double bestFS::get_solution(bool is_ds)
     fout.open("output.out", ios::out | ios::trunc);
     fout << "Best First Search\n";
     fout.close();
-	InitBestFS(Constants::FILEIN, Constants::FILEIN2);
+	InitBestFS(Constants::FILEIN);
     best_first_search(Constants::start, Constants::end, Constants::n_nodes);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;

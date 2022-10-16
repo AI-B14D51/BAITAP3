@@ -20,31 +20,22 @@ DFS::~DFS()
 int dMin = 1e8;                   
 vector<bool> visited(MAX, false); 
 vector<int> mark, res;            
-void DFS::InitDFS(string filein, string filein2, int n, int s, int t, vector<vector<int>> &Matrix)
+void DFS::InitDFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
 {
-    fstream fin,fin2;
-    fin2.open(filein2, ios::in);
-    int u, v, w, a, b;
+    fstream fin;
+    int u, v, w;
     Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++)
             Matrix[i][j] = 0;
-    while (!fin2.eof())
-    {
-    	fin2 >>a >>b;
-    	fin.open(filein, ios::in);
-      while (!fin.eof())
+    fin.open(filein, ios::in);
+    while (!fin.eof())
     {
         fin >> u >> v >> w;
-        if(a==u){
-        	w=w+b;
-        	Matrix[u][v]=w;
-        	Matrix[v][u]=w;
-		}
+       	Matrix[u][v]=w;
+       	Matrix[v][u]=w;
 	}
 		fin.close();  
-	}
-	fin2.close();
 }
 int DFS::sumOfMark(vector<vector<int>> Matrix)
 {
@@ -103,9 +94,9 @@ void DFS::ResultDFS(int s, int t){
     fout.close();
 }
 
-void DFS::runDFS(string filein, string filein2, int n, int s, int t, vector<vector<int>> &Matrix) {
+void DFS::runDFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix) {
     clock_t start = clock();
-    InitDFS(filein,filein2, n, s, t, Matrix);
+    InitDFS(filein, n, s, t, Matrix);
     mark.push_back(s);
     visited[s] = true;
     alg_DFS(n, s, t, Matrix);
@@ -121,6 +112,6 @@ void DFS::runDFS(string filein, string filein2, int n, int s, int t, vector<vect
 double DFS::get_solution(bool is_ds)
 {
 	vector<vector<int>> Matrix;
-    runDFS(Constants::FILEIN, Constants::FILEIN2, Constants::n_nodes, Constants::start, Constants::end, Matrix);
+    runDFS(Constants::FILEIN, Constants::n_nodes, Constants::start, Constants::end, Matrix);
 	return 0.0;
 }

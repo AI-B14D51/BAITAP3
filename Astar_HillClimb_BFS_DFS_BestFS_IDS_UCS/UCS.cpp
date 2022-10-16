@@ -24,32 +24,22 @@ vector<vector<int> > graph;
 // map to store cost of edges
 map<pair<int, int>, int> cost;
 
-void UCS::InitUCS(string filein, string filein2) {
+void UCS::InitUCS(string filein) {
     // create the graph
     graph.resize(Constants::n_nodes);
 
-    fstream fin,fin2;
-    fin2.open(filein2, ios::in);
-    int u, v, w, a, b;
-    while (!fin2.eof())
-    {
-    	fin2 >>a >>b;
-    	fin.open(filein, ios::in);
-      while (!fin.eof())
+    fstream fin;
+    int u, v, w;
+    fin.open(filein, ios::in);
+    while (!fin.eof())
     {
         fin >> u >> v >> w;
-        if(a==u){
-        	w=w+b;
         	// add edge
         	graph[u].push_back(v);
         	// add the cost
         	cost[make_pair(u, v)] = w;
-		}
 	}
 		fin.close();  
-	}
-	fin2.close();
-
 }
 
 // returns the minimum cost in a vector( if
@@ -134,7 +124,7 @@ vector<int> UCS::uniform_cost_search(vector<int> goal, int start)
 
 double UCS::get_solution(bool is_ds){
     clock_t start = clock();
-    InitUCS(Constants::FILEIN, Constants::FILEIN2);
+    InitUCS(Constants::FILEIN);
     // goal state
     vector<int> goal;
     goal.push_back(Constants::end);
