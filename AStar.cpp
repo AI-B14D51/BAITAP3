@@ -122,7 +122,7 @@ double Astar::get_solution(bool is_ds)
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
     fout.open("output.out", ios::app);
-    fout << "Duration time BFS: " << time_taken * 1000 << " miliseconds";
+    fout << "Duration time Astar: " << time_taken * 1000 << " miliseconds";
     fout.close();
 	return 0.0;
 }
