@@ -97,14 +97,13 @@ void Result_Astar(int s, int t, vector<vector<int>> Matrix) {
     fout.open("output.out", ios::out | ios::trunc);
     fout << "Astar\n";
     fout << "Duong di tu " << s << " den " << t << " la: " << endl;
-    int cost =nodes[t].h;
+    int cost =0;
     while(t != s) {
         fout << t << "<-";
         int a = nodes[t].cha;
-        cost=cost+nodes[a].h+Matrix[t][a];
+        cost=cost+Matrix[a][t];
         t=a;
     }
-    cost=cost+nodes[s].h;
     fout << s<<endl;
     fout << "Do dai duong di la: "<<cost<<endl;
     double vm, rss;
