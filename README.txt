@@ -26,7 +26,7 @@ After building, to run our code, run:
 		-st start
 		-en end
 		-l  limit
-		-a  algorithm 0:dfs, 1:bfs, 2:ids
+		-a  algorithm 0:dfs, 1:bfs, 2:ids , 3:bestFS 
 
 
 We conducted experiments on a Linux machine with 2.3Ghz Xeon 18 core processor and 256Gb of RAM. With 70 threads, DStream usually terminates after 20 minutes, RStream is 2 hours.

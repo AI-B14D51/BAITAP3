@@ -1,4 +1,4 @@
-#include "Network.h"
+ #include "Network.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -28,7 +28,7 @@ int Network::get_out_degree(uint n)
 bool Network::read_network_from_file(int no_nodes, string file, bool is_directed)
 {
 	clear();
-	
+
 	number_of_nodes = no_nodes;
 	out_neighbors = vector<vector<uint>>(no_nodes);
 	in_neighbors = vector<vector<uint>>(no_nodes);
@@ -36,7 +36,7 @@ bool Network::read_network_from_file(int no_nodes, string file, bool is_directed
 	// initiate preferences
 	preferences = vector<vector<uint>>(no_nodes);
 	vector<uint> ini(Constants::K);
-	
+
 	for (int i = 0; i < Constants::K; ++i) {
 		ini[i] = i;
 		probabilities.push_back(1.0 / (2 * Constants::K) * (1 + i)); // probability for each level of reference is 1/2k, 2/2k, 3/2k, ... k/2k
@@ -98,7 +98,7 @@ bool Network::read_network_from_file(int no_nodes, string file, bool is_directed
 				}
 
 				e_id = map_node_id[end_id];
-				if (!e_id && end_id != zero_id) { // if end node has not exist 
+				if (!e_id && end_id != zero_id) { // if end node has not exist
 					map_node_id[end_id] = id;
 					e_id = id;
 					id++;
@@ -177,7 +177,7 @@ uint Network::sample_influence(const kseeds & seeds)
 		q.push(seed);
 		visited[seed.first] = true;
 	}
-		
+
 	while (!q.empty()) {
 		pair<uint, int> p = q.front();
 		++re;
@@ -187,7 +187,7 @@ uint Network::sample_influence(const kseeds & seeds)
 			prob = ((double)preferences[p.first][p.second]) / out_neighbors[p.first].size();
 		}
 		else {
-			prob = 1.0 / out_neighbors[p.first].size(); 
+			prob = 1.0 / out_neighbors[p.first].size();
 		}
 
 		for (uint nei : out_neighbors[p.first]) {
@@ -326,7 +326,7 @@ uint Network::sample_influence_linear_threshold(const kseeds & seeds)
 //
 //			//// to decrease the influence
 //			//sum_tmp = sum_tmp * 1.5;
-//			
+//
 //			int r = common_instance->randomInThread(omp_get_thread_num()) % sum_tmp;
 //			uint tmp = 0;
 //			uint nei = -1;
@@ -338,7 +338,7 @@ uint Network::sample_influence_linear_threshold(const kseeds & seeds)
 //				tmp += pref[v] == -1 ? 1 : (preferences[v][pref[v]] + 1);
 //			}
 //
-//			if (nei == -1) 
+//			if (nei == -1)
 //				return 0;
 //			else if (pref[nei] != -1) { // if reach seed node
 //				return 1;
@@ -362,8 +362,8 @@ bool Network::read_sensor_data(int no_nodes, string file)
 	this->number_of_nodes = no_nodes;
 
 	// to match with NIPS paper
-	
-	
+
+
 	ifstream infile(file);
 
 	vector<vector<vector<double>>> tmp(no_nodes, vector<vector<double>>(3)); // store all values
@@ -376,7 +376,7 @@ bool Network::read_sensor_data(int no_nodes, string file)
 		int epoch, loc;
 		double te, hu, li, vol;
 		iss >> date >> time >> epoch >> loc >> te >> hu >> li >> vol;
-		
+
 		loc--;
 
 		if (loc >= no_nodes) return false;
@@ -384,11 +384,11 @@ bool Network::read_sensor_data(int no_nodes, string file)
 		tmp[loc][0].push_back(te);
 		if (te > max_temp) max_temp = te;
 		if (te < min_temp) min_temp = te;
-		
+
 		tmp[loc][1].push_back(hu);
 		if (hu > max_humid) max_humid = hu;
 		if (hu < min_humid) min_humid = hu;
-		
+
 		tmp[loc][2].push_back(li);
 		if (li > max_light) max_light = li;
 		if (li < min_light) min_light = li;
@@ -434,7 +434,7 @@ bool Network::read_sensor_data(int no_nodes, string file)
 double Network::get_entropy(const kseeds & seeds)
 {
 	double re = 0.0;
-	
+
 	for (kp p : seeds) {
 		for (double val : sensor_data[p.first][p.second])
 			if (val > 0) re += (-val * log10(val));
