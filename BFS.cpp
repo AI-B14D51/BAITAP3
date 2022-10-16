@@ -26,7 +26,7 @@ typedef pair<int, int> ii;
 vector<ii> graphbfs[max];
 int d[max];
 
-int check[max];
+int checkBFS[max];
 
 void BFS::input_bfs(string filein)
 {
@@ -49,11 +49,11 @@ void BFS::print_bfs(int begin, int destination)
     fout << "BFS\n";
     fout << "Path : " << endl;
     fout << destination << " <= ";
-    int i = check[destination];
+    int i = checkBFS[destination];
     while (i != begin)
     {
         fout << i << " <= ";
-        i = check[i];
+        i = checkBFS[i];
     }
     fout << begin;
     fout << endl
@@ -91,7 +91,7 @@ void BFS::bfs_execute(int root, int n)
             {
                 d[v] = d[u] + uv;
                 road.push(ii(v, d[v]));
-                check[v] = u;
+                checkBFS[v] = u;
             }
         }
     }

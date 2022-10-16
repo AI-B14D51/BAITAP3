@@ -10,7 +10,9 @@ enum ALG
 {
 	aDFS,
 	aBFS,
-	abestFS
+	abestFS,
+	aHill,
+	aAstar
 };
 
 class Constants

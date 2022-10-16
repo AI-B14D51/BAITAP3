@@ -22,7 +22,7 @@ vector<int> graph[max];
 vector<int> mark;
 vector<int> result;
 bool visited[max];
-int matrix[max][max];
+int matrixDFS[max][max];
 
 void DFS::input_dfs(string filein)
 {
@@ -34,8 +34,8 @@ void DFS::input_dfs(string filein)
         fin >> x >> y >> z;
         graph[x].push_back(y);
         graph[y].push_back(x);
-        matrix[x][y] = z;
-        matrix[y][x] = z;
+        matrixDFS[x][y] = z;
+        matrixDFS[y][x] = z;
     }
     fin.close();
 }
@@ -45,9 +45,9 @@ int DFS::sum_of_mark(int destination)
     int res = 0;
     for (int i = 0; i < (int)mark.size() - 1; i++)
     {
-        res += matrix[mark[i]][mark[i + 1]];
+        res += matrixDFS[mark[i]][mark[i + 1]];
     }
-    return res + matrix[mark[mark.size() - 1]][destination];
+    return res + matrixDFS[mark[mark.size() - 1]][destination];
 }
 
 void DFS::dfs_execute(int vt, int destination)

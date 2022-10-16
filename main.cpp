@@ -10,7 +10,8 @@
 #include "DFS.h"
 #include "BFS.h"
 #include "bestFS.h"
-
+#include "HillClimb.h"
+#include "AStar.h"
 //#include <time.h>
 #include <chrono>
 #include <iomanip> // setprecision
@@ -24,15 +25,9 @@ using namespace std;
 
 #pragma warning(disable : 4996)
 vector<uint> B_vals = {15, 20, 25, 30, 35, 40, 45, 50};
-// vector<uint> B_vals = { 50 };
-//  for sensor
-// vector<uint> B_vals = { 5,6,7,8,9,10,11,12,13,14,15 };
 
-// vector<uint> M_vals = {3,4,5};
 vector<uint> M_vals = {3};
 vector<double> Delta_vals = {1};
-// vector<double> Delta_vals = { 0.5,1.0,1.5};
-// vector<double> Delta_vals = { 1.5, 2.0, 3.0 };
 
 Network *g;
 
@@ -132,6 +127,12 @@ pair<string, int> parseArgs(int argc, char **argv)
 				case 2:
 					Constants::ALGORITHM = abestFS;
 					break;
+				case 3:
+					Constants::ALGORITHM = aHill;
+					break;
+				case 4:
+					Constants::ALGORITHM = aAstar;
+					break;
 				default:
 					Constants::ALGORITHM = aDFS;
 					break;
@@ -163,12 +164,7 @@ pair<string, int> parseArgs(int argc, char **argv)
 void run_command(string filename, int no_nodes)
 {
 	Network *g = new Network();
-	// bool r = false;
-	// if (Constants::DATA == Social) {
-	// 	r = g->read_network_from_file(no_nodes, filename, false);
-	// }
-	// else
-	// 	r = g->read_sensor_data(no_nodes, filename);
+	
 
 	if (false)
 	{
@@ -201,6 +197,20 @@ void run_command(string filename, int no_nodes)
 			bestFS *bestfs = new bestFS(g);
 			bestfs->get_solution();
 			delete bestfs;
+			break;
+		}
+		case aHill:
+		{
+			HillClimb *Hill = new HillClimb(g);
+			Hill->get_solution();
+			delete Hill;
+			break;
+		}
+		case aAstar:
+		{
+			AStar *astar = new AStar(g);
+			astar->get_solution();
+			delete astar;
 			break;
 		}
 		default:
