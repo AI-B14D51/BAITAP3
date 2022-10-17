@@ -1,11 +1,11 @@
 #pragma once
 #include "Framework.h"
 
-class Astar: public Framework
+class hillClimbing: public Framework
 {
 public:
-	Astar(Network * g);
-	~Astar();
+	hillClimbing(Network * g);
+	~hillClimbing();
 	double get_solution(bool is_ds = true);
 };
 

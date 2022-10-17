@@ -1,15 +1,16 @@
 #pragma once
 #include "Framework.h"
 
-class DFS : public Framework
+class DFS: public Framework
 {
 public:
-	DFS(Network *g);
+	DFS(Network * g);
 	~DFS();
 	double get_solution(bool is_ds = true);
-	void input_dfs(string filein);
-	int sum_of_mark(int destination);
-	void dfs_execute(int vt, int destination);
-	void print_result(int destination);
-	void run_dfs(string filein, int begin, int destination);
+	void InitDFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix);
+	int sumOfMark(vector<vector<int>> Matrix);
+	void alg_DFS(int n, int u, int t, vector<vector<int>> Matrix);
+	void ResultDFS(int s, int t);
+	void runDFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix);
 };
+
