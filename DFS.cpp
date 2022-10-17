@@ -1,4 +1,4 @@
-#include <iostream>
+#include<iostream>
 #include <iostream>
 #include <fstream>
 #include <time.h>
@@ -8,7 +8,7 @@
 #include "memory.h"
 using namespace std;
 
-DFS::DFS(Network *g) : Framework(g)
+DFS::DFS(Network * g) : Framework(g)
 {
 }
 
@@ -16,105 +16,102 @@ DFS::~DFS()
 {
 }
 
-#define max 100
-int length_road = INT32_MAX;
-vector<int> graph[max];
-vector<int> mark;
-vector<int> result;
-bool visited[max];
-int matrixDFS[max][max];
-
-void DFS::input_dfs(string filein)
+#define MAX 100
+int dMin = 1e8;                   
+vector<bool> visited(MAX, false); 
+vector<int> mark, res;            
+void DFS::InitDFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
 {
     fstream fin;
+    int u, v, w;
+    Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            Matrix[i][j] = 0;
     fin.open(filein, ios::in);
     while (!fin.eof())
     {
-        int x, y, z;
-        fin >> x >> y >> z;
-        graph[x].push_back(y);
-        graph[y].push_back(x);
-        matrixDFS[x][y] = z;
-        matrixDFS[y][x] = z;
-    }
-    fin.close();
+        fin >> u >> v >> w;
+       	Matrix[u][v]=w;
+       	Matrix[v][u]=w;
+	}
+		fin.close();  
 }
-
-int DFS::sum_of_mark(int destination)
+int DFS::sumOfMark(vector<vector<int>> Matrix)
 {
     int res = 0;
-    for (int i = 0; i < (int)mark.size() - 1; i++)
+    for (int i = 0; i < mark.size() - 1; i++)
     {
-        res += matrixDFS[mark[i]][mark[i + 1]];
+        res += Matrix[mark[i]][mark[i + 1]];
     }
-    return res + matrixDFS[mark[mark.size() - 1]][destination];
+    return res;
 }
 
-void DFS::dfs_execute(int vt, int destination)
+void DFS::alg_DFS(int n, int u, int t, vector<vector<int>> Matrix)
 {
-    for (int i = 0; i < graph[vt].size(); i++)
+    for (int i = 0; i < n; i++)
     {
-        int v = graph[vt][i];
-        if (!visited[v])
+        if (!visited[i] && Matrix[u][i])
         {
-            visited[v] = true;
-            if (v == destination)
+            mark.push_back(i);
+            visited[i] = true;
+            if (i == t)
             {
-                int distance = sum_of_mark(destination);
-                if (length_road > distance)
+                if (sumOfMark(Matrix) < dMin)
                 {
-                    length_road = distance;
-                    result = mark;
+                    dMin = sumOfMark(Matrix);
+                    res = mark;
                 }
-                visited[v] = false;
+                mark.pop_back();
+                visited[i] = false;
             }
             else
             {
-                mark.push_back(v);
-                dfs_execute(v,destination);
-                visited[v] = false;
+                alg_DFS(n, i, t, Matrix);
                 mark.pop_back();
+                visited[i] = false;
             }
         }
     }
 }
 
-void DFS::print_result(int destination)
-{
+void DFS::ResultDFS(int s, int t){
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "DFS" << endl;
-    fout << "Path : " << endl;
-    for (int i = 0; i < result.size(); i++)
-        fout << result[i] << " => ";
-    fout << destination << endl;
-    fout << "Length : " << length_road << endl;
+    fout << "DFS\n";
+    fout << "Duong di ngan nhat tu " << s << " den " << t << " la:" << endl;
+    for (int i = 0; i < res.size() - 1; i++)
+    {
+        fout << res[i] << "=>";
+    }
+    fout << res[res.size() - 1];
+    fout << endl;
+    fout << "Do dai duong di la : ";
+    fout << dMin;
     double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "Memory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fout << "\nThoi gian su dung: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-void DFS::run_dfs(string filein, int begin, int destination)
-{
+void DFS::runDFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix) {
     clock_t start = clock();
-    input_dfs(filein);
-    mark.push_back(begin);
-    visited[begin] = true;
-    dfs_execute(begin, destination);
-    print_result(destination);
+    InitDFS(filein, n, s, t, Matrix);
+    mark.push_back(s);
+    visited[s] = true;
+    alg_DFS(n, s, t, Matrix);
+    ResultDFS(s, t);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
-    fout.open("output.out", ios::out | ios::trunc);
-    fout << "Time taken by dfs is: " << time_taken * 1000 << " miliseconds";
+    fout.open("output.out", ios::app);
+    fout << "Thoi gian thuc hien DFS: " << time_taken * 1000 << " ms";
     fout.close();
 }
 
 double DFS::get_solution(bool is_ds)
 {
-    run_dfs(Constants::FILEIN, Constants::start, Constants::end);
-    return 0.0;
+	vector<vector<int>> Matrix;
+    runDFS(Constants::FILEIN, Constants::n_nodes, Constants::start, Constants::end, Matrix);
+	return 0.0;
 }

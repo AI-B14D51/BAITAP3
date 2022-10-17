@@ -1,4 +1,4 @@
-#include <iostream>
+#include<iostream>
 #include <iostream>
 #include <fstream>
 #include <time.h>
@@ -9,7 +9,7 @@
 #include "memory.h"
 using namespace std;
 
-bestFS::bestFS(Network *g) : Framework(g)
+bestFS::bestFS(Network * g) : Framework(g)
 {
 }
 
@@ -17,49 +17,55 @@ bestFS::~bestFS()
 {
 }
 
-typedef pair<int, int> ii;
-vector<vector<ii>> graphBest;
+typedef pair<int, int> pi; 
+vector<vector<pi> > graphBestFS;
 
-void bestFS::input_BestFS(string filein)
+
+void bestFS::addedge(int x, int y, int cost)
 {
-    fstream fin;
-    fin.open(filein, ios::in);
-    while (!fin.eof())
-    {
-        int x, y, z;
-        fin >> x >> y >> z;
-        graphBest[x].push_back(make_pair(y,z));
-        graphBest[y].push_back(make_pair(x,z));
-    }
-    fin.close();
+    graphBestFS[x].push_back(make_pair(cost, y));
+    graphBestFS[y].push_back(make_pair(cost, x));
 }
 
-void bestFS::best_first_search(int actual, int target, int n)
+ void bestFS::InitBestFS(string filein) {
+    graphBestFS.resize(Constants::n_nodes);
+    fstream fin;
+    
+    int u, v, w;
+    fin.open(filein, ios::in);
+      while (!fin.eof())
+    {
+        fin >> u >> v >> w;
+        addedge(u, v, w);
+	}
+		fin.close();  
+}
+// Function For Implementing Best First Search
+// Gives output path having lowest cost
+void bestFS::best_first_search(int actual_Src, int target, int n)
 {
     fstream fout;
-    fout.open("output.out", ios::out | ios::trunc);
-    fout << "Path: ";
+    fout.open("output.out", ios::app);
+    fout << "Duong di: ";
     vector<bool> visited(n, false);
-
-    priority_queue<ii, vector<ii>, greater<ii>> pq;
-    pq.push(make_pair(0, actual));
-    int s = actual;
+    // MIN HEAP priority queue
+    priority_queue<pi, vector<pi>, greater<pi> > pq;
+    // sorting in pq gets done by first value of pair
+    pq.push(make_pair(0, actual_Src));
+    int s = actual_Src;
     visited[s] = true;
-    while (!pq.empty())
-    {
+    while (!pq.empty()) {
         int x = pq.top().second;
-
+        // Displaying the path having lowest cost
         fout << x << " ";
         pq.pop();
         if (x == target)
             break;
-
-        for (int i = 0; i < graphBest[x].size(); i++)
-        {
-            if (!visited[graphBest[x][i].second])
-            {
-                visited[graphBest[x][i].second] = true;
-                pq.push(make_pair(graphBest[x][i].first, graphBest[x][i].second));
+ 
+        for (int i = 0; i < graphBestFS[x].size(); i++) {
+            if (!visited[graphBestFS[x][i].second]) {
+                visited[graphBestFS[x][i].second] = true;
+                pq.push(make_pair(graphBestFS[x][i].first,graphBestFS[x][i].second));
             }
         }
     }
@@ -71,19 +77,17 @@ double bestFS::get_solution(bool is_ds)
     clock_t start = clock();
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "Best First Search" << endl;
+    fout << "Best First Search\n";
     fout.close();
-    input_BestFS(Constants::FILEIN);
+	InitBestFS(Constants::FILEIN);
     best_first_search(Constants::start, Constants::end, Constants::n_nodes);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
-    fout.open("output.out", ios::out | ios::trunc);
-    fout << "Time taken by best first search is: " << time_taken * 1000 << " miliseconds" << endl;
+    fout.open("output.out", ios::app);
+    fout << "\nThoi gian thuc hien thuat toan: " << time_taken * 1000 << " ms";
     double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "Memory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fout << "\nBo nho su dung: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
     fout.close();
-    return 0.0;
+	return 0.0;
 }
