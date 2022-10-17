@@ -8,3 +8,4 @@ public:
 	~HillClimb();
 	double get_solution(bool is_ds = true);
 };
+

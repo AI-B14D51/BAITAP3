@@ -20,8 +20,7 @@ int Constants::M = 3;
 int Constants::start = 0;
 int Constants::end = 12;
 string Constants::FILEIN = "input.in";
-string Constants::WEIGHT = "weight.in";
-
+string Constants::FILEIN2 = "input2.in";
 int Constants::n_nodes = 20;
 int Constants::limit = 10;
 
