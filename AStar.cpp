@@ -1,129 +1,129 @@
-#include <iostream>
+#include<iostream>
 #include <iostream>
 #include <fstream>
 #include <time.h>
 #include <vector>
-#include <utility>
-#include <queue>
-
-#include "AStar.h"
+#include <map>
+#include <algorithm>
+#include "Astar.h"
 #include "Constants.h"
 #include "memory.h"
 using namespace std;
 
-AStar::AStar(Network *g) : Framework(g)
+Astar::Astar(Network * g) : Framework(g)
 {
 }
 
-AStar::~AStar()
+Astar::~Astar()
 {
 }
-#define max 100
-#define maxr 10000000
-typedef pair<int,int> ii;
-vector<ii> graphAstar[max];
-int matrix[max][max];
-int check[max];
-int dAstar[max];
-int weight[max];
 
-void AStar::input_astar(string filename, string weight){
-    fstream fin;
-    fin.open(filename,ios::in);
-    while(!fin.eof()){
-        int x,y,z;
+#define MAX 100
+vector<int> Close;
+vector<int> Open;
+
+struct NODE {
+    int g; // ts canh
+    int h; // ts dinh
+    int f; // g + h
+    int cha;
+};
+
+map<int, NODE> nodes;
+
+void InitAstar(string filein, string filein2, vector<vector<int>> &Matrix) {
+    Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
+    fstream fin,fin2;
+    fin.open(filein, ios::in);
+    while (!fin.eof())
+    {
+        int x, y, z;
         fin >> x >> y >> z;
-        matrix[x][y] = z;
-        matrix[y][x] = z;
-        graphAstar[x].push_back(make_pair(y, z));
-        graphAstar[y].push_back(make_pair(x, z));
+        Matrix[x][y] = z;
     }
     fin.close();
-    fin.open(weight,ios::in);
-    while(!fin.eof()){
-        int x,y;
-        fin >> x >> y;
-        weight[x] = y;
+    fin2.open(filein2, ios::in);
+    while(!fin2.eof()) {
+        int x, z;
+        fin2 >> x >> z;
+        nodes[x].h = z;
     }
-
+    fin2.close();
 }
 
-void AStar::astar_execute(int root, int destination){
-    priority_queue<ii, vector<ii>, greater<ii>> road;
-    for (int i = 0; i < max; i++)
-    {
-        dAstar[i] = maxr;
+void Xuly_Astar(int n, int s, int t, vector<vector<int>> Matrix) {
+    // gan gia tri dau cho node[i].f
+    for (int i = 0; i < n; i++) {
+        nodes[i].f = 1e6;
     }
-    dAstar[root] = weight[root];
-    road.push(ii(root, dAstar[root]));
-    while (!road.empty())
-    {
-        ii top = road.top();
-        road.pop();
-        int u = top.first;
-        if (dAstar[u] != top.second)
-            continue;
 
-        for (int i = 0; i < graphAstar[u].size(); i++)
-        {
-            int v = graphAstar[u][i].first;
-            int uv = graphAstar[u][i].second;
-            if (dAstar[v] + weight[v] - weight[u] > dAstar[u] + uv + weight[v] - weight[u])
-            {
-                dAstar[v] = dAstar[u] + uv + weight[v]-weight[u];
-                road.push(ii(v, dAstar[v]));
-                check[v] = u;
-                if(v == destination) break;
+    nodes[s].g = 0;
+    nodes[s].f = nodes[s].g + nodes[s].h;
+    Close.push_back(s);
+
+    while(s != t) {
+        for(int i = 0; i < n; i++) {
+            if(Matrix[s][i] && find(Close.begin(), Close.end(), i) == Close.end()) {
+                int tg_g = nodes[s].g + Matrix[s][i];
+                int tg_f = tg_g + nodes[i].h;
+                if (tg_f < nodes[i].f) {
+                    nodes[i].g = tg_g;
+                    nodes[i].f = tg_f;
+                    nodes[i].cha = s;                   
+                    if (find(Open.begin(), Open.end(), i) == Open.end()) {
+                        Open.push_back(i);
+                    }
+                }
             }
         }
+
+        int ind = 0;
+        int Min = nodes[Open[ind]].f;
+        for(int i = 1; i < Open.size(); i++) {
+            if (nodes[Open[i]].f < Min) {
+                Min = nodes[Open[i]].f;
+                ind = i;
+            }
+        }
+
+        s = Open[ind];
+        Close.push_back(Open[ind]);
+        Open.erase(Open.begin() + ind);
     }
 }
 
-void AStar::print_astar(int begin, int destination)
-{
+void Result_Astar(int s, int t, vector<vector<int>> Matrix) {
     fstream fout;
-    int length = 0;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "A Star\n";
-    fout << "Path : " << endl;
-    fout << destination << " <= ";
-    int i = check[destination];
-    length = matrix[destination][i];
-    while (i != begin)
-    {
-        fout << i << " <= ";
-        length += matrix[i][check[i]];
-
-        i = check[i];
+    fout << "Astar\n";
+    fout << "Duong di tu " << s << " den " << t << " la: " << endl;
+    int cost =0;
+    while(t != s) {
+        fout << t << "<-";
+        int a = nodes[t].cha;
+        cost=cost+Matrix[a][t];
+        t=a;
     }
-    fout << begin;
-    fout << endl
-         << "Length : " << length << endl;
+    fout << s<<endl;
+    fout << "Do dai duong di la: "<<cost<<endl;
     double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "\nMemory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fout << "Memory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-void AStar::run_astar(string filein, string weight, int begin, int destination)
+double Astar::get_solution(bool is_ds)
 {
-
     clock_t start = clock();
-    input_astar(filein, weight);
-    astar_execute(begin, destination);
-    print_astar(begin, destination);
+    vector<vector<int>> Matrix;
+    InitAstar(Constants::FILEIN, Constants::FILEIN2, Matrix);
+    Xuly_Astar(Constants::n_nodes, Constants::start, Constants::end, Matrix);
+    Result_Astar(Constants::start, Constants::end, Matrix);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
     fout.open("output.out", ios::app);
-    fout << "Time taken by a star: " << time_taken * 1000 << " miliseconds";
+    fout << "Duration time Astar: " << time_taken * 1000 << " miliseconds";
     fout.close();
-}
-
-double AStar::get_solution(bool is_ds)
-{
-    run_astar(Constants::FILEIN,Constants::WEIGHT, Constants::start, Constants::end);
-    return 0.0;
+	return 0.0;
 }
