@@ -217,7 +217,7 @@ pair<string, int> parseArgs(int argc, char** argv) {
 					Constants::ALGORITHM = aAstar;
 					break;
 				case 6:
-					Constants::ALGORITHM = aHillclimb;
+					Constants::ALGORITHM = aHillClimb;
 					break;
 				default:
 					Constants::ALGORITHM = abestFS;
@@ -287,7 +287,7 @@ void run_command(string filename, int no_nodes) {
 				delete astar;
 				break;
 			}
-			case aHillclimb: {
+			case aHillClimb: {
 				HillClimb *hill = new HillClimb(g);
 				hill->get_solution();
 				delete hill;

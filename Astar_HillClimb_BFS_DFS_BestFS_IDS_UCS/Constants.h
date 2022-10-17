@@ -2,7 +2,7 @@
 #pragma once
 using namespace std;
 enum DATATYPE { Social, Sensor };
-enum ALG {aDFS, aBFS, aIDS, aUCS, abestFS, aAstar, aHillclimb};
+enum ALG {aDFS, aBFS, aIDS, aUCS, abestFS, aAstar, aHillClimb};
 
 class Constants
 {
