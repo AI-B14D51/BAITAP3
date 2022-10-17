@@ -95,16 +95,19 @@ void alg_Astar(int n, int st, int en, vector<vector<int>> Matrix) {
     }
 }
 
-void result_Astar(int st, int en) {
+void result_Astar(int st, int en, vector<vector<int>> Matrix) {
+    int sum = 0;
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
     fout << "Astar\n";
     fout << "Duong di tu " << st << " den " << en << " la: " << endl;
     while(en != st) {
         fout << en << "<-";
+        sum += Matrix[nodes[en].cha][en];
         en = nodes[en].cha;
     }
     fout << st;
+    fout << "\nTong duong di: " << sum;
     double vm, rss;
     process_mem_usage(vm, rss);
     fout << "\nMemory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
@@ -117,7 +120,7 @@ double Astar::get_solution(bool is_ds)
     vector<vector<int>> Matrix;
     InitAstar(Constants::FILEIN, Matrix);
     alg_Astar(Constants::n_nodes, Constants::start, Constants::end, Matrix);
-    result_Astar(Constants::start, Constants::end);
+    result_Astar(Constants::start, Constants::end, Matrix);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
