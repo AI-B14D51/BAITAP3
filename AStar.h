@@ -1,11 +1,15 @@
 #pragma once
 #include "Framework.h"
 
-class Astar: public Framework
+class AStar : public Framework
 {
 public:
-	Astar(Network * g);
-	~Astar();
-	double get_solution(bool is_ds = true);
-};
+    AStar(Network *g);
+    ~AStar();
+    double get_solution(bool is_ds = true);
+    void input_astar(string filename, string weight);
+    void astar_execute(int root,int destination);
+    void print_astar(int begin, int destination);
+    void run_astar(string filein, string weight, int begin, int destination);
 
+};

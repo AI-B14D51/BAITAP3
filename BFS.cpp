@@ -1,14 +1,17 @@
-#include<iostream>
+#include <iostream>
 #include <iostream>
 #include <fstream>
 #include <time.h>
 #include <vector>
+#include <utility>
+#include <queue>
+
 #include "BFS.h"
 #include "Constants.h"
 #include "memory.h"
 using namespace std;
 
-BFS::BFS(Network * g) : Framework(g)
+BFS::BFS(Network *g) : Framework(g)
 {
 }
 
@@ -16,114 +19,102 @@ BFS::~BFS()
 {
 }
 
-#define MAX 100
-#define TRUE 1
-#define FALSE 0
-#define VOCUNG 10000000
+#define max 100
+#define maxr 9999999
 
-vector<int> before(MAX, 0);   // mảng đánh dấu đường đi.
-vector<int> d(MAX, 0);       // mảng đánh dấu khoảng cách.
-vector<int> visited(MAX, 0); // mảng đánh dấu đỉnh đã được gán nhãn.
+typedef pair<int, int> ii;
+vector<ii> graphbfs[max];
+int d[max];
 
-void BFS::InitBFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
+int checkBFS[max];
+
+void BFS::input_bfs(string filein)
 {
     fstream fin;
     fin.open(filein, ios::in);
-    Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            Matrix[i][j] = VOCUNG;
     while (!fin.eof())
     {
         int u, v, w;
         fin >> u >> v >> w;
-        Matrix[u][v] = w;
-        Matrix[v][u] = w;
+        graphbfs[u].push_back(make_pair(v, w));
+        graphbfs[v].push_back(make_pair(u, w));
     }
     fin.close();
 }
 
-void BFS::ResultBFS(int s, int t)
+void BFS::print_bfs(int begin, int destination)
 {
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
     fout << "BFS\n";
-    fout << "Duong di ngan nhat tu " << s << " den " << t << " la" << endl;
-    fout << t << "<=";
-    int i = before[t];
-    while (i != s)
+    fout << "Path : " << endl;
+    fout << destination << " <= ";
+    int i = checkBFS[destination];
+    while (i != begin)
     {
-        fout << i << "<=";
-        i = before[i];
+        fout << i << " <= ";
+        i = checkBFS[i];
     }
-    fout << s;
+    fout << begin;
     fout << endl
-         << "Do dai duong di la : " << d[t];
+         << "Length : " << d[destination] << endl;
     double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "\nMemory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
+    fout << "\nMemory: "
+         << "VM: " << vm << " KB"
+         << "; RSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-void BFS::alg_BFS(int n, int s, int t, vector<vector<int>> Matrix)
+void BFS::bfs_execute(int root, int n)
 {
-    int u, minp;
-    // khởi tạo nhãn tạm thời cho các đỉnh.
-    for (int v = 0; v < n; v++)
+    priority_queue<ii, vector<ii>, greater<ii>> road;
+    for (int i = 0; i <= n; i++)
     {
-        d[v] = Matrix[s][v];
-        before[v] = s;
-        visited[v] = FALSE;
+        d[i] = maxr;
     }
-    before[s] = 0;
-    d[s] = 0;
-    visited[s] = TRUE;
-    // bươc lặp
-    while (!visited[t])
+    d[root] = 0;
+    road.push(ii(root, 0));
+    while (!road.empty())
     {
-        minp = VOCUNG;
-        // tìm đỉnh u sao cho d[u] là nhỏ nhất
-        for (int v = 0; v < n; v++)
+        ii top = road.top();
+        road.pop();
+        int u = top.first;
+        if (d[u] != top.second)
+            continue;
+
+        for (int i = 0; i < graphbfs[u].size(); i++)
         {
-            if ((!visited[v]) && (minp > d[v]))
+            int v = graphbfs[u][i].first;
+            int uv = graphbfs[u][i].second;
+            if (d[v] > d[u] + uv)
             {
-                u = v;
-                minp = d[v];
-            }
-        }
-        visited[u] = TRUE; // u la dinh co nhan tam thoi nho nhat
-        if (!visited[t])
-        {
-            // gán nhãn lại cho các đỉnh.
-            for (int v = 0; v < n; v++)
-            {
-                if ((!visited[v]) && (d[u] + Matrix[u][v] < d[v]))
-                {
-                    d[v] = d[u] + Matrix[u][v];
-                    before[v] = u;
-                }
+                d[v] = d[u] + uv;
+                road.push(ii(v, d[v]));
+                checkBFS[v] = u;
             }
         }
     }
 }
 
-void BFS::runBFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
+void BFS::run_bfs(string filein, int begin, int destination)
 {
-    // BFS
+
     clock_t start = clock();
-    InitBFS(filein, n, s, t, Matrix);
-    alg_BFS(n, s, t, Matrix);
-    ResultBFS(s, t);
+    input_bfs(filein);
+    bfs_execute(begin, Constants::n_nodes);
+    print_bfs(begin, destination);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
     fout.open("output.out", ios::app);
-    fout << "Duration time BFS: " << time_taken * 1000 << " miliseconds";
+    fout << "Time taken by bfs: " << time_taken * 1000 << " miliseconds";
     fout.close();
 }
 
-double BFS::get_solution(bool is_ds){
-    vector<vector<int>> Matrix;
-    runBFS(Constants::FILEIN, Constants::n_nodes, Constants::start, Constants::end, Matrix);
+double BFS::get_solution(bool is_ds)
+{
+
+    run_bfs(Constants::FILEIN, Constants::start, Constants::end);
     return 0.0;
 }
