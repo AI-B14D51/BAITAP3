@@ -3,14 +3,12 @@
 #include <fstream>
 #include <time.h>
 #include <vector>
-#include <map>
-#include <utility>
-#include <algorithm>
 #include "HillClimb.h"
 #include "Constants.h"
 #include "memory.h"
 using namespace std;
 
+#define MAX 100
 
 HillClimb::HillClimb(Network * g) : Framework(g)
 {
@@ -19,83 +17,121 @@ HillClimb::HillClimb(Network * g) : Framework(g)
 HillClimb::~HillClimb()
 {
 }
-#define max 100
-typedef pair<int,int> ii;
-bool visitedHC[max];
-vector<ii> graphHC[max]; 
-vector<int> markHC;
-bool found = false;
-vector<int> resultHC;
-bool compare(ii a, ii b){
-    return a.second < b.second;
-}
-void input_HC(string filename) {
-    fstream fin;
-    fin.open(filename, ios::in);
+
+#define MAX 100
+int dMin2 = 1e8;                   
+vector<bool> visited2(MAX, false); 
+vector<int> mark2, res2;   
+
+void Input_HillClimb(string filein,string filein2, vector<vector<int>> &Matrix, vector<int> &thamsodinh) {
+    Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
+    thamsodinh = vector<int>(MAX,0);
+    int u, v, w, a, b;
+    fstream fin,fin2;
+    fin.open(filein, ios::in);
     while (!fin.eof())
     {
-        int u, v, w;
-        fin >> u >> v >> w;
-        graphHC[u].push_back(make_pair(v,w));
-        graphHC[v].push_back(make_pair(u,w));
+    	fin >>u >>v >>w;
+    	Matrix[u][v] = w;
+        Matrix[v][u] = w;
     }
-    for(int i = 0; i < 100; i++){
-        sort(graphHC[i].begin(),graphHC[i].end(),compare);
-    }
-    fin.close();
+    fin.close();  
+    fin2.open(filein2, ios::in);
+    while (!fin2.eof())
+    {
+        fin2 >> a >> b;
+        thamsodinh[a]=b;
+	}
+	fin2.close();
 }
 
 
-void execute_HC(int vt, int destination) {
-    if(found) return;
-    for (int i = 0; i < graphHC[vt].size(); i++)
+int SumOfMark(vector<vector<int>> Matrix)
+{
+    int res = 0;
+    for (int i = 0; i < mark2.size() - 1; i++)
     {
-        int v = graphHC[vt][i].first;
-        if (!visitedHC[v])
-        {
-            visitedHC[v] = true;
-            if (v == destination)
+        res += Matrix[mark2[i]][mark2[i+1]];
+    }
+    return res;
+}
+
+void HillClimb_Algorithm(int n, int u, int t, vector<vector<int>> Matrix, vector<int> thamsodinh)
+{
+    int thamsodinh_min=100;
+    for (int i = 0; i < n; i++)
+    {
+        if(!visited2[i] && Matrix[u][i]&&thamsodinh[i]< thamsodinh_min){
+            thamsodinh_min=thamsodinh[i];
+            }
+        }
+    for (int i = 0; i < n; i++)
+    {
+        if(!visited2[i] && Matrix[u][i]&&thamsodinh[i]== thamsodinh_min){
+            mark2.push_back(i);
+            visited2[i] = true;
+            if (i == t)
             {
-                markHC.push_back(v);
-                resultHC = markHC;
-                found = true;
-                return;
+                if (SumOfMark(Matrix) < dMin2)
+                {
+                    dMin2 = SumOfMark(Matrix);
+                    res2 = mark2;
+                }
+                break;
+                mark2.pop_back();
+                visited2[i] = false;
+
             }
             else
             {
-                markHC.push_back(v);
-                execute_HC(v,destination);
-                visitedHC[v] = false;
-                markHC.pop_back();
+                HillClimb_Algorithm(n, i, t, Matrix, thamsodinh);
+                mark2.pop_back();
+                visited2[i] = false;
             }
+            }
+
         }
     }
-}
 
-void print_HC() {
+
+void Res_HillClimb(int s, int t){
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "Hill Climbing" << endl;
-    fout << "Path: ";
-    for(int i = 0; i < resultHC.size()-1; i++) {
-        fout << resultHC[i] << "->";
+    fout << "HillClimb\n";
+    fout << "Duong di ngan nhat tu " << s << " den " << t << " la:" << endl;
+    for (int i = 0; i < res2.size() - 1; i++)
+    {
+        fout << res2[i] << "=>";
     }
-    fout << resultHC[resultHC.size() -1] << endl;
+    fout << res2[res2.size() - 1];
+    fout << endl;
+    fout << "Do dai duong di: ";
+    fout << dMin2;
+    double vm, rss;
+    process_mem_usage(vm, rss);
+    fout << "\nMemory: " << "VM: " << vm << " KB\n" << ";\tRSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-double HillClimb::get_solution(bool is_ds){
+void HillClimb_Exe(string filein, string filein2, int n, int s, int t, vector<vector<int>> &Matrix, vector<int> &thamsodinh) {
     clock_t start = clock();
-    input_HC(Constants::FILEIN);
-    execute_HC(Constants::start, Constants::end);
-    print_HC();
+    Input_HillClimb(filein, filein2, Matrix, thamsodinh);
+    mark2.push_back(s);
+    visited2[s] = true;
+    HillClimb_Algorithm(n, s, t, Matrix, thamsodinh);
+    Res_HillClimb(s, t);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
     fout.open("output.out", ios::app);
-    fout << "Time taken by Hill Climbing: " << time_taken * 1000 << " miliseconds";
-    double vm, rss;
-    process_mem_usage(vm, rss);
-    fout << "\nMemory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
-    return 0.0;
+    fout << "Thoi gian HillClimb: " << time_taken * 1000 << " miliseconds";
+    fout.close();
+}
+
+double HillClimb::get_solution(bool is_ds)
+{
+	vector<vector<int>> Matrix;
+	vector<int> thamsodinh;
+    	HillClimb_Exe(Constants::FILEIN, Constants::FILEIN2, Constants::n_nodes, Constants::start, Constants::end, Matrix, thamsodinh);
+	return 0.0;
 }

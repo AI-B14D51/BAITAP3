@@ -1,0 +1,7 @@
+HillClimb
+Duong di ngan nhat tu 0 den 9 la:
+0=>2=>4=>7=>9
+Do dai duong di: 21
+Memory: VM: 6884 KB
+;	RSS: 4384KB
+Thoi gian HillClimb: 1.33 miliseconds

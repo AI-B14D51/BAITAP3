@@ -12,22 +12,6 @@ Framework::~Framework()
 {
 }
 
-//double Framework::estimate_influence(const vector<pair<uint, uint>> seeds)
-//{
-//	double re = 0.0;
-//	int n = 100;
-//	vector<bool> a(n, false);
-//
-//	#pragma omp parallel for
-//	for (int i = 0; i < n; ++i) {
-//		a[i] = (g->sample_influence_linear_threshold(seeds) == 1);
-//	}
-//
-//	for (bool b : a)
-//		if (b) re += 1.0;
-//
-//	return re / n * g->get_no_nodes();
-//}
 
 double Framework::estimate_test(const kseeds & seeds, uint n)
 {

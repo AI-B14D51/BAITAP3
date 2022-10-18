@@ -1,26 +1,15 @@
 #include <string>
 #pragma once
 using namespace std;
-enum DATATYPE
-{
-	Social,
-	Sensor
-};
-enum ALG
-{
-	aDFS,
-	aBFS,
-	abestFS,
-	aHill,
-	aAstar
-};
+enum DATATYPE { Social, Sensor };
+enum ALG {aDFS, aBFS, aIDS, aUCS, abestFS, aAstar, aHillClimb};
 
 class Constants
 {
 public:
 	Constants();
 	~Constants();
-
+	
 	static ALG ALGORITHM;
 	static DATATYPE DATA;
 	static int NUM_THREAD;
@@ -28,12 +17,14 @@ public:
 	static int K;
 	static int M;
 	static double EPS;
-	static double DELTA;		 // for streaming algorithm
-	static int NO_DENOISE_STEPS; // steps for eps' = 0 reach epsilon
+	static double DELTA; // for streaming algorithm
+	static int NO_DENOISE_STEPS; // steps for eps' = 0 reach epsilon 
 	static int start;
 	static int end;
 	static string FILEIN;
+	static string FILEIN2;
 	static int n_nodes;
 	static int limit;
-	static string WEIGHT;
 };
+
+

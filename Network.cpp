@@ -302,57 +302,6 @@ uint Network::sample_influence_linear_threshold(const kseeds & seeds)
 	return 0;
 }
 
-// old - maybe wrong
-//uint Network::sample_influence_linear_threshold(const kseeds & seeds)
-//{
-//	vector<int> pref(number_of_nodes, -1);
-//	for (pair<uint, int> p : seeds) {
-//		pref[p.first] = p.second;
-//	}
-//
-//	int r_node = common_instance->randomInThread(omp_get_thread_num()) % number_of_nodes;
-//	if (pref[r_node] != -1) { // if random node is of seeds
-//		return 1;
-//	}
-//	else {
-//		queue<uint> q;
-//		vector<bool> visited(number_of_nodes, false);
-//		visited[r_node] = true;
-//		while (true) {
-//			uint sum_tmp = in_neighbors[r_node].size() * Constants::K;
-//			//for (uint v : in_neighbors[r_node]) {
-//			//	sum_tmp += pref[v] == -1 ? 1 : (preferences[v][pref[v]] + 1);
-//			//}
-//
-//			//// to decrease the influence
-//			//sum_tmp = sum_tmp * 1.5;
-//			
-//			int r = common_instance->randomInThread(omp_get_thread_num()) % sum_tmp;
-//			uint tmp = 0;
-//			uint nei = -1;
-//			for (uint v : in_neighbors[r_node]) {
-//				if (tmp <= r && r <= tmp + (pref[v] == -1 ? 1 : (preferences[v][pref[v]] + 1))) {
-//					nei = v;
-//					break;
-//				}
-//				tmp += pref[v] == -1 ? 1 : (preferences[v][pref[v]] + 1);
-//			}
-//
-//			if (nei == -1) 
-//				return 0;
-//			else if (pref[nei] != -1) { // if reach seed node
-//				return 1;
-//			}
-//			else if (!visited[nei]) {
-//				r_node = nei;
-//				visited[nei] = true;
-//			}
-//			else return 0;
-//		}
-//	}
-//	return 0;
-//}
-
 
 
 bool Network::read_sensor_data(int no_nodes, string file)
@@ -416,16 +365,6 @@ bool Network::read_sensor_data(int no_nodes, string file)
 		}
 	}
 
-	/*
-	for (int i = 0; i < no_nodes; ++i) {
-		for (int ii = 0; ii < 3; ++ii) {
-			for (int val : tmp[i][ii]) {
-				int bin_idx = floor((val - min_vals[ii]) / bin_range[ii]);
-				sensor_data[i][ii][bin_idx] += 1.0;
-			}
-		}
-	}*/
-
 	return true;
 }
 
@@ -439,23 +378,6 @@ double Network::get_entropy(const kseeds & seeds)
 		for (double val : sensor_data[p.first][p.second])
 			if (val > 0) re += (-val * log10(val));
 	}
-	/*
-	ksensors measure(3, kbins(max_no_bin, 0.0));
-	vector<double> no_record(3, 0.0);
-
-	for (kp p : seeds) {
-		for (int i = 0; i < max_no_bin; ++i) {
-			measure[p.second][i] += sensor_data[p.first][p.second][i];
-			no_record[p.second] += sensor_data[p.first][p.second][i];
-		}
-	}
-
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < max_no_bin; ++j) {
-			double tmp = measure[i][j] / no_record[i];
-			if (tmp > 0) re += (-tmp * log(tmp));
-		}
-	}*/
 
 	return re * 100;
 }
