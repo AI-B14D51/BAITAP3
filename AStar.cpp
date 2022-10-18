@@ -1,129 +1,152 @@
-#include <iostream>
+#include<iostream>
 #include <iostream>
 #include <fstream>
 #include <time.h>
-#include <vector>
-#include <utility>
-#include <queue>
 
-#include "AStar.h"
+#include <vector>
+#include <map>
+#include <algorithm>
+#include "Astar.h"
 #include "Constants.h"
 #include "memory.h"
+
 using namespace std;
 
-AStar::AStar(Network *g) : Framework(g)
+Astar::Astar(Network * g) : Framework(g)
 {
 }
 
-AStar::~AStar()
+Astar::~Astar()
 {
 }
-#define max 100
-#define maxr 10000000
-typedef pair<int,int> ii;
-vector<ii> graphAstar[max];
-int matrix[max][max];
-int check[max];
-int dAstar[max];
-int weight[max];
 
-void AStar::input_astar(string filename, string weight){
+#define MAX 100
+#define MAXN 1e6
+vector<int> Close;
+vector<int> Open;
+
+struct NODE
+{
+    int g; // ts canh
+    int h; // ts dinh
+    int f; // g + h
+    int pr;
+};
+
+map<int, NODE> nodes;
+int pathCs = 0;
+
+void InitAstar(string filein, vector<vector<int>> &Matrix)
+{
     fstream fin;
-    fin.open(filename,ios::in);
-    while(!fin.eof()){
-        int x,y,z;
-        fin >> x >> y >> z;
-        matrix[x][y] = z;
-        matrix[y][x] = z;
-        graphAstar[x].push_back(make_pair(y, z));
-        graphAstar[y].push_back(make_pair(x, z));
+    fin.open(filein, ios::in);
+
+    Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
+
+    while (!fin.eof())
+    {
+        int u, v, w;
+        fin >> u >> v >> w;
+        Matrix[u][v] = w;
     }
     fin.close();
-    fin.open(weight,ios::in);
-    while(!fin.eof()){
-        int x,y;
-        fin >> x >> y;
-        weight[x] = y;
+    fin.open("nodeWeight.in", ios::in);
+    while(!fin.eof()) {
+        int u, w;
+        fin >> u >> w;
+        nodes[u].h = w;
     }
-
+    fin.close();
 }
 
-void AStar::astar_execute(int root, int destination){
-    priority_queue<ii, vector<ii>, greater<ii>> road;
-    for (int i = 0; i < max; i++)
-    {
-        dAstar[i] = maxr;
-    }
-    dAstar[root] = weight[root];
-    road.push(ii(root, dAstar[root]));
-    while (!road.empty())
-    {
-        ii top = road.top();
-        road.pop();
-        int u = top.first;
-        if (dAstar[u] != top.second)
-            continue;
 
-        for (int i = 0; i < graphAstar[u].size(); i++)
+void alg_Astar(int n, int Src, int target, vector<vector<int>> Matrix)
+{
+    // Khoi tao node[i].f
+    for (int i = 0; i < n; i++)
+    {
+        nodes[i].f = MAXN;
+    }
+
+    nodes[Src].g = 0;
+    nodes[Src].f = nodes[Src].g + nodes[Src].h;
+    Close.push_back(Src);
+
+    while(Src != target)
+    {
+        for(int i = 0; i < n; i++)
         {
-            int v = graphAstar[u][i].first;
-            int uv = graphAstar[u][i].second;
-            if (dAstar[v] + weight[v] - weight[u] > dAstar[u] + uv + weight[v] - weight[u])
+            if(Matrix[Src][i] && find(Close.begin(), Close.end(), i) == Close.end())
             {
-                dAstar[v] = dAstar[u] + uv + weight[v]-weight[u];
-                road.push(ii(v, dAstar[v]));
-                check[v] = u;
-                if(v == destination) break;
+                int tmp_g = nodes[Src].g + Matrix[Src][i];
+                int tmp_f = tmp_g + nodes[i].h;
+                if (tmp_f < nodes[i].f)
+                {
+                    nodes[i].g = tmp_g;
+                    nodes[i].f = tmp_f;
+                    nodes[i].pr = Src;
+                    if (find(Open.begin(), Open.end(), i) == Open.end())
+                    {
+                        Open.push_back(i);
+                    }
+                }
             }
         }
+
+        int ind = 0;
+        int Min = nodes[Open[ind]].f;
+        for(int i = 1; i < Open.size(); i++)
+        {
+            if (nodes[Open[i]].f < Min)
+            {
+                Min = nodes[Open[i]].f;
+                ind = i;
+            }
+        }
+
+        Src = Open[ind];
+        Close.push_back(Open[ind]);
+        Open.erase(Open.begin() + ind);
     }
 }
 
-void AStar::print_astar(int begin, int destination)
+void result_Astar(int Src, int target, vector<vector<int>> Matrix)
 {
     fstream fout;
-    int length = 0;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "A Star\n";
-    fout << "Path : " << endl;
-    fout << destination << " <= ";
-    int i = check[destination];
-    length = matrix[destination][i];
-    while (i != begin)
+    fout << "AStar\n";
+    fout << "Duong di tu " << Src << " den " << target << " la: " << endl;
+    while(target != Src)
     {
-        fout << i << " <= ";
-        length += matrix[i][check[i]];
-
-        i = check[i];
+        fout << target << "<-";
+        pathCs += Matrix[nodes[target].pr][target];
+        target = nodes[target].pr;
     }
-    fout << begin;
-    fout << endl
-         << "Length : " << length << endl;
+    fout << Src;
+    fout << "\nTong duong di: " << pathCs;
     double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "\nMemory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fout << "\nMemory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-void AStar::run_astar(string filein, string weight, int begin, int destination)
+void r_Astar(string filein,int n, int Src,int target)
 {
-
     clock_t start = clock();
-    input_astar(filein, weight);
-    astar_execute(begin, destination);
-    print_astar(begin, destination);
+    vector<vector<int>> Matrix;
+    InitAstar(filein, Matrix);
+    alg_Astar(n,Src,target, Matrix);
+    result_Astar(Src,target,Matrix);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
     fout.open("output.out", ios::app);
-    fout << "Time taken by a star: " << time_taken * 1000 << " miliseconds";
+    fout << "Duration time Astar: " << time_taken * 1000 << " miliseconds";
     fout.close();
 }
 
-double AStar::get_solution(bool is_ds)
+double Astar::get_solution(bool is_ds)
 {
-    run_astar(Constants::FILEIN,Constants::WEIGHT, Constants::start, Constants::end);
-    return 0.0;
+    r_Astar(Constants::FILEIN,Constants::n_nodes,Constants::start,Constants::end);
+	return 0.0;
 }

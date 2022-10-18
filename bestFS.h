@@ -1,12 +1,18 @@
+
 #pragma once
+#include <queue>
 #include "Framework.h"
 
-class bestFS : public Framework
+class BestFS: public Framework
 {
 public:
-    bestFS(Network *g);
-    ~bestFS();
-    double get_solution(bool is_ds = true);
-    void input_BestFS(string filein);
-    void best_first_search(int actual, int target, int n);
+	BestFS(Network * g);
+	~BestFS();
+	double get_solution(bool is_ds = true);
+	void addedge(int x,int y, int cost);
+	void InitBestFS(string filein);
+    void ResultBestFS(int s, int t,int n);
+    void alg_BestFS(int s,int t,int n);
+    void runBestFS(string filein, int s, int t,int n);
 };
+
